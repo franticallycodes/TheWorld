@@ -1,0 +1,6 @@
+﻿services:
+  theworld:
+    image: theworld
+    build:
+      context: .
+      dockerfile: TheWorld/Dockerfile

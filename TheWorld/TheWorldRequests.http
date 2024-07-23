@@ -1,0 +1,14 @@
+@HostAddress = https://localhost:7165
+
+GET {{HostAddress}}/api/countries
+Accept: application/json
+###
+
+GET {{HostAddress}}/api/countries/usa
+Accept: application/json
+###
+
+GET {{HostAddress}}/api/countries/bol
+Accept: application/json
+###
+
