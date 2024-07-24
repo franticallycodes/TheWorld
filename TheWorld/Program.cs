@@ -1,6 +1,7 @@
 using Serilog;
 using Serilog.Formatting.Compact;
 using TheWorld;
+using TheWorld.RestCountriesIntegration;
 
 Log.Logger = new LoggerConfiguration()
 	// .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
@@ -32,6 +33,8 @@ try
 	// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 	builder.Services.AddEndpointsApiExplorer();
 	builder.Services.AddSwaggerGen();
+
+	builder.Services.AddScoped<IQueryService, QueryService>();
 
 	builder.Host.UseSerilog();
 

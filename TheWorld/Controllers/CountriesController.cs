@@ -1,36 +1,39 @@
 using Microsoft.AspNetCore.Mvc;
+using TheWorld.RestCountriesIntegration;
 
 namespace TheWorld.Controllers;
 
 [ApiController]
 [Route("api")]
-[ResponseCache(Duration = 3600)]
+[ResponseCache(Duration = 3600, VaryByQueryKeys = new[]{"*"})]
 public class CountriesController : ControllerBase
 {
 	private readonly ICountriesClient _apiClient;
 	private readonly ILogger<CountriesController> _logger;
+	private readonly IQueryService _queryService;
 
-	public CountriesController(ICountriesClient apiClient, ILogger<CountriesController> logger)
+	public CountriesController(ICountriesClient apiClient, ILogger<CountriesController> logger, IQueryService queryService)
 	{
 		_apiClient = apiClient;
 		_logger = logger;
+		_queryService = queryService;
 	}
 
 	[HttpGet("countries")]
-	public async Task<IActionResult> GetCountries([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 400)
+	public async Task<IActionResult> GetCountries([FromQuery] string? searchTerm = null, [FromQuery] bool sortDesc = false, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 400)
 	{
 		try
 		{
 			if (pageNumber <= 0 || pageSize <= 0)
 				return BadRequest($"Invalid pageNumber of {pageNumber} or pageSize of {pageSize} provided.");
 
-			var data = await _apiClient.GetAllCountries();
+			var countries = await _apiClient.GetAllCountries();
 
-			if (data is null) return NoContent(); // this seems highly unlikely that the API call succeeds but no countries return
+			if (countries is null) return NoContent();
 
-			var pagedData = data.Skip((pageNumber - 1) * pageSize)
-				.Take(pageSize)
-				.Select(country => country.Name.Common);
+			// search/filter term
+			// sorting
+			var pagedData = _queryService.GetPage(countries, pageSize, pageNumber);
 
 			return Ok(pagedData);
 		}
@@ -48,7 +51,7 @@ public class CountriesController : ControllerBase
 	{
 		try
 		{
-			if (countryCode.Length == 0)
+			if (string.IsNullOrWhiteSpace(countryCode))
 				return BadRequest("Provided country code cannot be blank");
 
 			var data = await _apiClient.GetCountryByCode(countryCode);
@@ -87,7 +90,7 @@ public class CountriesController : ControllerBase
 	}
 
 	[HttpGet("languages")]
-	public async Task<IActionResult> GetCountriesByLanguages()
+	public async Task<IActionResult> GetCountriesByLanguage()
 	{
 		try
 		{

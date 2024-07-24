@@ -1,13 +1,10 @@
-﻿using System.Text.Json;
-
-namespace TheWorld;
+﻿namespace TheWorld.RestCountriesIntegration;
 
 public abstract class ApiClientBase
 {
-	// if we had multiple API integrations we'd probably want to identify HttpClient by name
 	private readonly HttpClient _httpClient;
 	private readonly ILogger _logger;
-	const string Message = "Error accessing external API @ {baseAddress} for endpoint '{urlPath}'";
+	private const string Message = "Error accessing external API @ {baseAddress} for endpoint '{urlPath}'";
 
 	protected ApiClientBase(HttpClient httpClient, ILogger logger)
 	{

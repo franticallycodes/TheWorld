@@ -1,4 +1,4 @@
-﻿namespace TheWorld;
+﻿namespace TheWorld.Models;
 
 public class Language
 {

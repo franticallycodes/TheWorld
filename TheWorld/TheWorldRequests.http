@@ -16,7 +16,7 @@ GET {{HostAddress}}/api/countries/bol
 Accept: application/json
 ###
 
-GET {{HostAddress}}/api/countries/s
+GET {{HostAddress}}/api/countries/x
 Accept: application/json
 ###
 
