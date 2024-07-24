@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using TheWorld.QueryExtensions;
 using TheWorld.RestCountriesIntegration;
 
 namespace TheWorld.Controllers;
@@ -10,13 +11,11 @@ public class CountriesController : ControllerBase
 {
 	private readonly ICountriesClient _apiClient;
 	private readonly ILogger<CountriesController> _logger;
-	private readonly IQueryService _queryService;
 
-	public CountriesController(ICountriesClient apiClient, ILogger<CountriesController> logger, IQueryService queryService)
+	public CountriesController(ICountriesClient apiClient, ILogger<CountriesController> logger)
 	{
 		_apiClient = apiClient;
 		_logger = logger;
-		_queryService = queryService;
 	}
 
 	[HttpGet("countries")]
@@ -31,11 +30,13 @@ public class CountriesController : ControllerBase
 
 			if (countries is null) return NoContent();
 
-			// search/filter term
-			// sorting
-			var pagedData = _queryService.GetPage(countries, pageSize, pageNumber);
+			var selectedCountries = countries
+				.SearchCountries(searchTerm)
+				.SortCountries(sortDesc)
+				.GetPage(pageSize, pageNumber)
+				.Select(country => country.Name.Common);
 
-			return Ok(pagedData);
+			return Ok(selectedCountries);
 		}
 		catch (Exception e)
 		{
@@ -54,11 +55,11 @@ public class CountriesController : ControllerBase
 			if (string.IsNullOrWhiteSpace(countryCode))
 				return BadRequest("Provided country code cannot be blank");
 
-			var data = await _apiClient.GetCountryByCode(countryCode);
+			var country = await _apiClient.GetCountryByCode(countryCode);
 
-			if (data is null) return NoContent();
+			if (country is null) return NoContent();
 
-			return Ok(data);
+			return Ok(country);
 		}
 		catch (Exception e)
 		{
@@ -70,15 +71,19 @@ public class CountriesController : ControllerBase
 	}
 
 	[HttpGet("regions")]
-	public async Task<IActionResult> GetCountriesByRegion()
+	public async Task<IActionResult> GetCountriesByRegion([FromQuery] string? searchTerm = null, [FromQuery] bool sortDesc = false)
 	{
 		try
 		{
-			var data = await _apiClient.GetRegions();
+			var regions = await _apiClient.GetRegions();
 
-			if (data is null) return NoContent();
+			if (regions is null) return NoContent();
 
-			return Ok(data);
+			var selectedRegions = regions
+				.SearchRegions(searchTerm)
+				.SortRegions(sortDesc);
+
+			return Ok(selectedRegions);
 		}
 		catch (Exception e)
 		{
@@ -90,15 +95,19 @@ public class CountriesController : ControllerBase
 	}
 
 	[HttpGet("languages")]
-	public async Task<IActionResult> GetCountriesByLanguage()
+	public async Task<IActionResult> GetCountriesByLanguage([FromQuery] string? searchTerm = null, [FromQuery] bool sortDesc = false)
 	{
 		try
 		{
-			var data = await _apiClient.GetLanguages();
+			var languages = await _apiClient.GetLanguages();
 
-			if (data is null) return NoContent();
+			if (languages is null) return NoContent();
 
-			return Ok(data);
+			var selectedLanguages = languages
+				.SearchLanguages(searchTerm)
+				.SortLanguages(sortDesc);
+
+			return Ok(selectedLanguages);
 		}
 		catch (Exception e)
 		{

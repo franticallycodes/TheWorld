@@ -34,8 +34,6 @@ try
 	builder.Services.AddEndpointsApiExplorer();
 	builder.Services.AddSwaggerGen();
 
-	builder.Services.AddScoped<IQueryService, QueryService>();
-
 	builder.Host.UseSerilog();
 
 	var app = builder.Build();
