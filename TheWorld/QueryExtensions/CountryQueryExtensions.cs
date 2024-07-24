@@ -8,8 +8,7 @@ public static class CountryQueryExtensions
 		string.IsNullOrWhiteSpace(searchTerm)
 			? countries
 			: countries.Where(cntry =>
-				cntry.Name.Common.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-				|| cntry.Name.Official.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+				cntry.Name.Common.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
 
 	public static IEnumerable<Country> SortCountries(this IEnumerable<Country> countries, bool sortDesc) =>
 		sortDesc
