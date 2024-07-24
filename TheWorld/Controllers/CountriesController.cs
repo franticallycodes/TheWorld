@@ -28,8 +28,6 @@ public class CountriesController : ControllerBase
 
 			var countries = await _apiClient.GetAllCountries();
 
-			if (countries is null) return NoContent();
-
 			var selectedCountries = countries
 				.SearchCountries(searchTerm)
 				.SortCountries(sortDesc)
@@ -57,8 +55,6 @@ public class CountriesController : ControllerBase
 
 			var country = await _apiClient.GetCountryByCode(countryCode);
 
-			if (country is null) return NoContent();
-
 			return Ok(country);
 		}
 		catch (Exception e)
@@ -76,8 +72,6 @@ public class CountriesController : ControllerBase
 		try
 		{
 			var regions = await _apiClient.GetRegions();
-
-			if (regions is null) return NoContent();
 
 			var selectedRegions = regions
 				.SearchRegions(searchTerm)
@@ -100,8 +94,6 @@ public class CountriesController : ControllerBase
 		try
 		{
 			var languages = await _apiClient.GetLanguages();
-
-			if (languages is null) return NoContent();
 
 			var selectedLanguages = languages
 				.SearchLanguages(searchTerm)
