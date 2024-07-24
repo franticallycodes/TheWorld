@@ -1,12 +1,30 @@
-﻿namespace TheWorld;
+﻿using Microsoft.Extensions.Caching.Memory;
+
+namespace TheWorld;
 
 public class RestCountriesApiClient : ApiClientBase, ICountriesClient
 {
-	public RestCountriesApiClient(HttpClient httpClient, ILogger<RestCountriesApiClient> logger)
-		: base(httpClient, logger) { }
+	private readonly IMemoryCache _cache;
+	private const string CacheKey = "AllTheCountriesOfTheWorld"; 
 
-	public async Task<IEnumerable<Country>?> GetAllCountries() =>
-		await GetMultiple<Country>("all");
+	public RestCountriesApiClient(HttpClient httpClient, ILogger<RestCountriesApiClient> logger, IMemoryCache cache)
+		: base(httpClient, logger)
+	{
+		_cache = cache;
+	}
+
+	public async Task<IEnumerable<Country>?> GetAllCountries()
+	{
+		if (_cache.TryGetValue(CacheKey, out IEnumerable<Country> allCachedCountries))
+			return allCachedCountries;
+
+		var allCountries = await GetMultiple<Country>("all");
+
+		if (allCountries is not null)
+			_cache.Set(CacheKey, allCountries, TimeSpan.FromHours(6));
+
+		return allCountries;
+	}
 
 	public async Task<Country?> GetCountryByCode(string countryCode) =>
 		await GetSingle<Country>($"alpha/{countryCode}");

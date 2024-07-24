@@ -26,6 +26,9 @@ try
 		client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]);
 	});
 
+	builder.Services.AddMemoryCache();
+	builder.Services.AddResponseCaching();
+
 	// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 	builder.Services.AddEndpointsApiExplorer();
 	builder.Services.AddSwaggerGen();
@@ -58,6 +61,7 @@ try
 	app.UseAuthorization();
 
 	app.MapControllers();
+	app.UseResponseCaching();
 
 	app.Run();
 }

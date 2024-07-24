@@ -4,6 +4,7 @@ namespace TheWorld.Controllers;
 
 [ApiController]
 [Route("api")]
+[ResponseCache(Duration = 3600)]
 public class CountriesController : ControllerBase
 {
 	private readonly ICountriesClient _apiClient;
