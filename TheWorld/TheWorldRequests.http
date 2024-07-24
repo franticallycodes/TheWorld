@@ -20,3 +20,11 @@ GET {{HostAddress}}/api/countries/s
 Accept: application/json
 ###
 
+GET {{HostAddress}}/api/regions
+Accept: application/json
+###
+
+GET {{HostAddress}}/api/languages
+Accept: application/json
+###
+

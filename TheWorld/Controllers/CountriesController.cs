@@ -29,7 +29,7 @@ public class CountriesController : ControllerBase
 
 			var pagedData = data.Skip((pageNumber - 1) * pageSize)
 				.Take(pageSize)
-				.Select(country => country.Name.Official); // could put this in dedicated mapping logic
+				.Select(country => country.Name.Common);
 
 			return Ok(pagedData);
 		}
@@ -38,7 +38,7 @@ public class CountriesController : ControllerBase
 			const string message = "Error ID {errorNumber} failed retrieving countries. pageNumber:{pageNumber} pageSize:{pageSize}";
 			var errorNumber = Guid.NewGuid();
 			_logger.LogError(e, message, errorNumber, pageNumber, pageSize);
-			return StatusCode(500, $"Unexpected error occured. Error reference number: {errorNumber}");
+			return MyBad(errorNumber);
 		}
 	}
 
@@ -61,7 +61,50 @@ public class CountriesController : ControllerBase
 			const string message = "Error ID {errorNumber} failed retrieving country. countryCode:{countryCode}";
 			var errorNumber = Guid.NewGuid();
 			_logger.LogError(e, message, errorNumber, countryCode);
-			return StatusCode(500, $"Unexpected error occured. Error reference number: {errorNumber}");
+			return MyBad(errorNumber);
 		}
 	}
+
+	[HttpGet("regions")]
+	public async Task<IActionResult> GetCountriesByRegion()
+	{
+		try
+		{
+			var data = await _apiClient.GetRegions();
+
+			if (data is null) return NoContent();
+
+			return Ok(data);
+		}
+		catch (Exception e)
+		{
+			const string message = "Error ID {errorNumber} failed retrieving regions.";
+			var errorNumber = Guid.NewGuid();
+			_logger.LogError(e, message, errorNumber);
+			return MyBad(errorNumber);
+		}
+	}
+
+	[HttpGet("languages")]
+	public async Task<IActionResult> GetCountriesByLanguages()
+	{
+		try
+		{
+			var data = await _apiClient.GetLanguages();
+
+			if (data is null) return NoContent();
+
+			return Ok(data);
+		}
+		catch (Exception e)
+		{
+			const string message = "Error ID {errorNumber} failed retrieving languages.";
+			var errorNumber = Guid.NewGuid();
+			_logger.LogError(e, message, errorNumber);
+			return MyBad(errorNumber);
+		}
+	}
+
+	private ObjectResult MyBad(Guid errorNumber) =>
+		StatusCode(500, $"Unexpected error occured. Error reference number: {errorNumber}");
 }
