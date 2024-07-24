@@ -4,11 +4,19 @@ GET {{HostAddress}}/api/countries
 Accept: application/json
 ###
 
+GET {{HostAddress}}/api/countries?page=2&pageSize=5
+Accept: application/json
+###
+
 GET {{HostAddress}}/api/countries/usa
 Accept: application/json
 ###
 
 GET {{HostAddress}}/api/countries/bol
+Accept: application/json
+###
+
+GET {{HostAddress}}/api/countries/s
 Accept: application/json
 ###
 
