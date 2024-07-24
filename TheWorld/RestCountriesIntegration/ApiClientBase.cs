@@ -1,4 +1,6 @@
-﻿namespace TheWorld.RestCountriesIntegration;
+﻿using System.Net;
+
+namespace TheWorld.RestCountriesIntegration;
 
 public abstract class ApiClientBase
 {
@@ -12,11 +14,14 @@ public abstract class ApiClientBase
 		_logger = logger;
 	}
 
-	protected async Task<IEnumerable<T>?> GetMultiple<T>(string urlPath)
+	protected async Task<IEnumerable<T>?> GetAsync<T>(string urlPath)
 	{
 		try
 		{
-			return await _httpClient.GetFromJsonAsync<IEnumerable<T>>(urlPath);
+			var response = await _httpClient.GetAsync(urlPath);
+			if (response.StatusCode == HttpStatusCode.BadRequest) return null;
+			response.EnsureSuccessStatusCode();
+			return await response.Content.ReadFromJsonAsync<IEnumerable<T>>();
 		}
 		catch (Exception e)
 		{
@@ -24,7 +29,4 @@ public abstract class ApiClientBase
 			throw;
 		}
 	}
-
-	protected async Task<T?> GetSingle<T>(string urlPath) where T : class =>
-		(await GetMultiple<T>(urlPath))?.FirstOrDefault();
 }

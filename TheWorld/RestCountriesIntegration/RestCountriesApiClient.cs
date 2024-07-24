@@ -14,24 +14,24 @@ public class RestCountriesApiClient : ApiClientBase, ICountriesClient
 		_cache = cache;
 	}
 
-	public async Task<IEnumerable<Country>?> GetAllCountries()
+	public async Task<IEnumerable<Country>> GetAllCountries()
 	{
 		if (_cache.TryGetValue(CacheKey, out IEnumerable<Country> cachedCountries))
 			return cachedCountries;
 
-		var allCountries = await GetMultiple<Country>("all");
+		var allCountries = await GetAsync<Country>("all");
 		var sortedCountries = allCountries?.OrderBy(cntry => cntry.Name.Common);
 
 		if (sortedCountries is not null)
 			_cache.Set(CacheKey, sortedCountries, TimeSpan.FromHours(6));
 
-		return sortedCountries;
+		return sortedCountries ?? Enumerable.Empty<Country>();
 	}
 
-	public async Task<Country?> GetCountryByCode(string countryCode) =>
-		await GetSingle<Country>($"alpha/{countryCode}");
+	public async Task<IEnumerable<Country>> GetCountryByCode(string countryCode) =>
+		await GetAsync<Country>($"alpha/{countryCode}") ?? Enumerable.Empty<Country>();
 
-	public async Task<IEnumerable<Region>?> GetRegions()
+	public async Task<IEnumerable<Region>> GetRegions()
 	{
 		var allCountries = await GetAllCountries();
 		return allCountries?.GroupBy(cntry => cntry.Region)
@@ -39,10 +39,10 @@ public class RestCountriesApiClient : ApiClientBase, ICountriesClient
 			{
 				RegionName = group.Key,
 				Countries = group.Select(cntry => cntry.Name.Common)
-			});
+			}) ?? Enumerable.Empty<Region>();
 	}
 
-	public async Task<IEnumerable<Language>?> GetLanguages()
+	public async Task<IEnumerable<Language>> GetLanguages()
 	{
 		var allCountries = await GetAllCountries();
 		return allCountries?.Where(cntry => cntry.Languages is not null)
@@ -53,14 +53,14 @@ public class RestCountriesApiClient : ApiClientBase, ICountriesClient
 			{
 				LanguageName = group.Key,
 				Countries = group.Select(tuple => tuple.Country)
-			});
+			}) ?? Enumerable.Empty<Language>();
 	}
 }
 
 public interface ICountriesClient
 {
-	Task<IEnumerable<Country>?> GetAllCountries();
-	Task<Country?> GetCountryByCode(string countryCode);
-	Task<IEnumerable<Region>?> GetRegions();
-	Task<IEnumerable<Language>?> GetLanguages();
+	Task<IEnumerable<Country>> GetAllCountries();
+	Task<IEnumerable<Country>> GetCountryByCode(string countryCode);
+	Task<IEnumerable<Region>> GetRegions();
+	Task<IEnumerable<Language>> GetLanguages();
 }
