@@ -8,6 +8,10 @@ GET {{HostAddress}}/api/countries?page=2&pageSize=5
 Accept: application/json
 ###
 
+GET {{HostAddress}}/api/countries?searchTerm=me&sortDesc=true
+Accept: application/json
+###
+
 GET {{HostAddress}}/api/countries/usa
 Accept: application/json
 ###
@@ -24,7 +28,15 @@ GET {{HostAddress}}/api/regions
 Accept: application/json
 ###
 
+GET {{HostAddress}}/api/regions?searchTerm=c&sortDesc=true
+Accept: application/json
+###
+
 GET {{HostAddress}}/api/languages
+Accept: application/json
+###
+
+GET {{HostAddress}}/api/languages?searchTerm=x&sortDesc=true
 Accept: application/json
 ###
 
