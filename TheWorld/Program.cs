@@ -1,11 +1,11 @@
 using Serilog;
+using Serilog.Events;
 using Serilog.Formatting.Compact;
-using TheWorld;
 using TheWorld.RestCountriesIntegration;
 
 Log.Logger = new LoggerConfiguration()
-	// .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-	// .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Warning)
+	.MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+	.MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Warning)
 	.Enrich.FromLogContext()
 	.Enrich.WithProcessId()
 	.Enrich.WithThreadId()
